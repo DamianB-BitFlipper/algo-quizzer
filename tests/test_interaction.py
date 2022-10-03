@@ -1,4 +1,7 @@
+import pytest
 from pytest import fixture
+
+import algosdk
 
 from algopytest import (
     application_global_state,
@@ -93,6 +96,14 @@ def test_student_wrong_solution(student1_in, teacher_smart_contract_with_solutio
 
     assert state['is_correct'] == 0
 
+def test_student_check_solution_nonexistent_solution(student1_in, teacher_smart_contract_id, student_smart_contract_id):
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=f'.*logic eval error: assert failed.*'):
+        call_app(
+            sender=student1_in,
+            app_id=student_smart_contract_id,
+            app_args=["check_solution", SOLUTION],
+            foreign_apps=[teacher_smart_contract_id],
+        )
 
 def test_multiple_students_submitting_solutions(student1_in, student2_in, student3_in, teacher_smart_contract_with_solution_id, student_smart_contract_id):
     student_solutions = [
