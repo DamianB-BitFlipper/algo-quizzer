@@ -30,13 +30,20 @@ def student_program():
     # the student at `var_is_correct` is set to `Int(1)`. Otherwise, it is
     # set to `Int(0)`.
     student_solution = Txn.application_args[1]
+    solution = App.globalGetEx(Int(1), Bytes("solution"))
     check_solution = Seq([
         # Sanity checks
         Assert(Txn.application_args.length() == Int(2)),
 
-        If(App.globalGetEx(Int(1), Bytes("solution")) == student_solution)
-        .Then(App.localPut(Int(1), var_is_correct, Int(1)))
-        .Else(App.localPut(Int(1), var_is_correct, Int(0)))
+        # Make sure that there is a solution available
+        solution,
+        Assert(solution.hasValue()),
+        
+        If(solution.value() == student_solution)
+        .Then(App.localPut(Int(0), var_is_correct, Int(1)))
+        .Else(App.localPut(Int(0), var_is_correct, Int(0))),
+
+        Return(Int(1)),
     ])
     
     # Control flow logic of the smart contract
@@ -49,6 +56,9 @@ def student_program():
         [Txn.application_args[0] == Bytes("check_solution"), check_solution],
     )
 
+    return program
+
+    
 if __name__ == "__main__":
     print(compileTeal(student_program(), Mode.Application, version=5))
 

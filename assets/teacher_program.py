@@ -2,7 +2,7 @@
 from pyteal import *
 
 var_teacher = Bytes("teacher")
-var_solution = Bytest("solution")
+var_solution = Bytes("solution")
 
 def teacher_program():
     """
@@ -29,6 +29,8 @@ def teacher_program():
         Assert(Txn.application_args.length() == Int(2)),
 
         App.globalPut(var_solution, Txn.application_args[1]),
+
+        Return(Int(1)),
     ])
 
     # Code block invoked to clear the quiz solution. Only the `teacher`
@@ -40,6 +42,8 @@ def teacher_program():
         Assert(Txn.application_args.length() == Int(1)),
 
         App.globalDel(var_solution),
+
+        Return(Int(1)),        
     ])
     
     # Control flow logic of the smart contract
@@ -53,5 +57,8 @@ def teacher_program():
         [Txn.application_args[0] == Bytes("clear_solution"), clear_solution],
     )
 
+    return program
+
+    
 if __name__ == "__main__":
     print(compileTeal(teacher_program(), Mode.Application, version=5))
