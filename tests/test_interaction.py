@@ -34,7 +34,15 @@ def test_teacher_set_solution(teacher_smart_contract_with_solution_id):
     # Assert that the `solution` was set properly
     assert state['solution'] == SOLUTION
 
-    
+def test_student_set_solution_raises(student1_in, teacher_smart_contract_id):
+    # A student should not be able to set the solution
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):
+        call_app(
+            sender=student1_in,
+            app_id=teacher_smart_contract_id,
+            app_args=["set_solution", WRONG_SOLUTION],
+        )
+
 def test_teacher_clear_solution(teacher, teacher_smart_contract_with_solution_id):    
     # Clear the solution
     call_app(
@@ -51,6 +59,14 @@ def test_teacher_clear_solution(teacher, teacher_smart_contract_with_solution_id
 
     assert 'solution' not in state
 
+def test_student_clear_solution_raises(student1_in, teacher_smart_contract_with_solution_id):
+    # A student should not be able to clear the solution
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):
+        call_app(
+            sender=student1_in,
+            app_id=teacher_smart_contract_with_solution_id,
+            app_args=["clear_solution"],
+        )    
 
 def test_teacher_clear_nonexistent_solution(teacher, teacher_smart_contract_id):
     # Clear a nonexistent solution which should be a No-Op
@@ -96,8 +112,8 @@ def test_student_wrong_solution(student1_in, teacher_smart_contract_with_solutio
 
     assert state['is_correct'] == 0
 
-def test_student_check_solution_nonexistent_solution(student1_in, teacher_smart_contract_id, student_smart_contract_id):
-    with pytest.raises(algosdk.error.AlgodHTTPError, match=f'.*logic eval error: assert failed.*'):
+def test_student_check_solution_nonexistent_solution_raises(student1_in, teacher_smart_contract_id, student_smart_contract_id):
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):
         call_app(
             sender=student1_in,
             app_id=student_smart_contract_id,
