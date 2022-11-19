@@ -1,6 +1,6 @@
 from pytest import fixture
 from algopytest import (
-    deploy_smart_contract,
+    create_app,
     opt_in_app,
     close_out_app,
 )
@@ -18,7 +18,7 @@ def teacher(owner):
 
 @fixture
 def teacher_smart_contract_id(teacher):
-    with deploy_smart_contract(
+    with create_app(
             teacher,
             approval_program=teacher_program(), 
             clear_program=clear_program(),
@@ -28,7 +28,7 @@ def teacher_smart_contract_id(teacher):
 
 @fixture
 def student_smart_contract_id(teacher):
-    with deploy_smart_contract(
+    with create_app(
             teacher,
             approval_program=student_program(), 
             clear_program=clear_program(),
