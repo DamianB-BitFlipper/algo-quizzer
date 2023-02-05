@@ -5,6 +5,7 @@ from algopytest import (
 )
 
 def test_teacher_smart_contract_initialization(teacher, teacher_smart_contract_id):
+    """Test that the initialization logic of the teacher smart contract works correctly."""
     # Read the teacher's address from the application's global state
     state = application_global_state(
         teacher_smart_contract_id,
@@ -17,6 +18,7 @@ def test_teacher_smart_contract_initialization(teacher, teacher_smart_contract_i
     
 
 def test_student_smart_contract_initialization(teacher, student_smart_contract_id):
+    """Test that the initialization logic of the student smart contract works correctly."""
     # Read the teacher's address from the application's global state
     state = application_global_state(
         student_smart_contract_id,
