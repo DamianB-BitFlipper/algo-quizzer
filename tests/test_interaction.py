@@ -14,6 +14,7 @@ WRONG_SOLUTION = "c^2 = a^2 - b^2"
 
 @fixture
 def teacher_smart_contract_with_solution_id(teacher, teacher_smart_contract_id):
+    """Return the teacher smart contract with a posted solution."""
     # Set the solution
     call_app(
         sender=teacher,
@@ -24,7 +25,8 @@ def teacher_smart_contract_with_solution_id(teacher, teacher_smart_contract_id):
     # Return the same `teacher_smart_contract_id`, but after it has a `solution` set
     return teacher_smart_contract_id
     
-def test_teacher_set_solution(teacher_smart_contract_with_solution_id):    
+def test_teacher_set_solution(teacher_smart_contract_with_solution_id):
+    """Test that the teacher can set the solution."""
     # Read the application's global state which includes the set solution
     state = application_global_state(
         teacher_smart_contract_with_solution_id,
@@ -35,6 +37,7 @@ def test_teacher_set_solution(teacher_smart_contract_with_solution_id):
     assert state['solution'] == SOLUTION
 
 def test_student_set_solution_raises(student1_in, teacher_smart_contract_id):
+    """Test that no non-teacher may set the solution."""
     # A student should not be able to set the solution
     with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):
         call_app(
@@ -43,7 +46,8 @@ def test_student_set_solution_raises(student1_in, teacher_smart_contract_id):
             app_args=["set_solution", WRONG_SOLUTION],
         )
 
-def test_teacher_clear_solution(teacher, teacher_smart_contract_with_solution_id):    
+def test_teacher_clear_solution(teacher, teacher_smart_contract_with_solution_id):
+    """Test that the teacher may clear any posted solution."""
     # Clear the solution
     call_app(
         sender=teacher,
@@ -60,6 +64,7 @@ def test_teacher_clear_solution(teacher, teacher_smart_contract_with_solution_id
     assert 'solution' not in state
 
 def test_student_clear_solution_raises(student1_in, teacher_smart_contract_with_solution_id):
+    """Test that no non-teacher may clear any posted solution."""
     # A student should not be able to clear the solution
     with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):
         call_app(
@@ -69,6 +74,7 @@ def test_student_clear_solution_raises(student1_in, teacher_smart_contract_with_
         )    
 
 def test_teacher_clear_nonexistent_solution(teacher, teacher_smart_contract_id):
+    """Test that a teacher clearing a non-existent solution is a no-operation."""
     # Clear a nonexistent solution which should be a No-Op
     call_app(
         sender=teacher,
@@ -86,6 +92,7 @@ def test_teacher_clear_nonexistent_solution(teacher, teacher_smart_contract_id):
 
 
 def test_student_correct_solution(student1_in, teacher_smart_contract_with_solution_id, student_smart_contract_id):
+    """Test the expected behavior when a student submits a correct solution."""
     call_app(
         sender=student1_in,
         app_id=student_smart_contract_id,
@@ -100,6 +107,7 @@ def test_student_correct_solution(student1_in, teacher_smart_contract_with_solut
 
 
 def test_student_wrong_solution(student1_in, teacher_smart_contract_with_solution_id, student_smart_contract_id):
+    """Test the expected behavior when a student submits an incorrect solution."""
     call_app(
         sender=student1_in,
         app_id=student_smart_contract_id,
@@ -113,6 +121,7 @@ def test_student_wrong_solution(student1_in, teacher_smart_contract_with_solutio
     assert state['is_correct'] == 0
 
 def test_student_check_solution_nonexistent_solution_raises(student1_in, teacher_smart_contract_id, student_smart_contract_id):
+    """Test that it fails when a student attempts to check a solution when none exists."""
     with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):
         call_app(
             sender=student1_in,
@@ -122,6 +131,7 @@ def test_student_check_solution_nonexistent_solution_raises(student1_in, teacher
         )
 
 def test_multiple_students_submitting_solutions(student1_in, student2_in, student3_in, teacher_smart_contract_with_solution_id, student_smart_contract_id):
+    """Test that multiple students may submit both correct and incorrect solutions to the same teacher smart contract."""
     student_solutions = [
         (student1_in, SOLUTION),
         (student2_in, SOLUTION),

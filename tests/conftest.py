@@ -29,7 +29,7 @@ def teacher_smart_contract_id(teacher):
 
 @fixture
 def student_smart_contract_id(teacher):
-    """Deploy the ``student_program`` to the Algorand network."""    
+    """Deploy the ``student_program`` to the Algorand network."""
     with create_app(
             teacher,
             approval_program=student_program(), 
